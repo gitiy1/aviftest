@@ -1,0 +1,53 @@
+name: Convert and Push AVIF
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.png'
+      - '**.jpg'
+      - '**.jpeg'
+      - '!**.avif'
+
+jobs:
+  convert-and-push:
+    runs-on: ubuntu-latest
+    name: Convert images to AVIF and push to branches
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          ref: 'main'
+
+      - name: Setup ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
+      - name: Convert images to AVIF and move to output directory
+        run: |
+          mkdir -p output
+          find . -maxdepth 1 -type f ! -name '*.avif' \( -iname \*.png -o -iname \*.jpg -o -iname \*.jpeg \) -exec sh -c 'convert "$0"  -define "heic:speed=1" -quality 30 "output/${0%.*}.avif"' {} \;
+
+      - name: Commit and push to main branch output folder
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add output/
+          git commit -m "Add converted AVIF images to main branch output folder" || echo "No changes to commit"
+          git push
+
+      - name: Checkout output branch
+        uses: actions/checkout@v2
+        with:
+          ref: 'output'
+
+      - name: Copy AVIF images to output branch
+        run: |
+          cp output/*.avif .
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.avif
+          git commit -m "Add converted AVIF images to output branch" || echo "No changes to commit"
+          git push origin output
