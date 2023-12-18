@@ -38,18 +38,20 @@ jobs:
           git commit -m "Add converted AVIF images to main branch output folder" || echo "No changes to commit"
           git push
 
+      - name: Copy Converted AVIF images to output folder
+        run: |
+          cp output/*.avif ../output/*.avif
+
       - name: Checkout output branch
         uses: actions/checkout@v4
         with:
           ref: 'output'
-          path: '../output'
 
 
       - name: Copy AVIF images to output branch
         run: |
           ls -a
-          cp output/*.avif ../output/*.avif
-          cd ../output
+          cp ../output/*.avif output/*.avif
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add *.avif
