@@ -25,10 +25,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y imagemagick
 
-      - name: Convert images to AVIF and move to output directory
+      - name: Incremental Conversion to AVIF
         run: |
           mkdir -p output
-          find . -maxdepth 1 -type f ! -name '*.avif' \( -iname \*.png -o -iname \*.jpg -o -iname \*.jpeg \) -exec sh -c 'convert "$0"  -define "heic:speed=1" -quality 30 "output/${0%.*}.avif"' {} \;
+          for file in $(find . -maxdepth 1 -type f \( -iname \*.png -o -iname \*.jpg -o -iname \*.jpeg \) ! -name '*.avif'); do
+            avif="output/${file%.*}.avif"
+            if [ ! -f "$avif" ] || [ "$file" -nt "$avif" ]; then
+              convert "$file" -define "heic:speed=1" -quality 30 "$avif"
+            fi
+          done
 
       - name: Commit and push to main branch output folder
         run: |
