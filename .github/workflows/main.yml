@@ -40,8 +40,8 @@ jobs:
 
       - name: Copy Converted AVIF images to output folder
         run: |
-          mkdir -p ../output
-          cp output/*.avif ../output/*.avif
+          mkdir -p /home/runner/output
+          cp output/*.avif /home/runner/output/*.avif
 
       - name: Checkout output branch
         uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
       - name: Copy AVIF images to output branch
         run: |
           ls -a
-          cp ../output/*.avif output/*.avif
+          cp /home/runner/output/*.avif output/*.avif
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add *.avif
