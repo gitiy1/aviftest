@@ -16,7 +16,7 @@ jobs:
     name: Convert images to AVIF and push to branches
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: 'main'
 
@@ -39,13 +39,16 @@ jobs:
           git push
 
       - name: Checkout output branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: 'output'
+          path: '../output'
+
 
       - name: Copy AVIF images to output branch
         run: |
-          cp output/*.avif .
+          cp output/*.avif ../output/*.avif
+          cd ../output
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add *.avif
