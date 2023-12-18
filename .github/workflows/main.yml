@@ -47,6 +47,7 @@ jobs:
 
       - name: Copy AVIF images to output branch
         run: |
+          ls -a
           cp output/*.avif ../output/*.avif
           cd ../output
           git config --local user.email "action@github.com"
